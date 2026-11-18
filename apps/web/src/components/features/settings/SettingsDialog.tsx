@@ -47,7 +47,6 @@ const settingsTabGroups = (): { id: string, label: string }[] => [
     { id: "settings", label: _("Settings") },
     { id: "workspace", label: _("Workspace") },
     { id: "integrations", label: _("Integrations") },
-    { id: "ai", label: _("AI") },
     { id: "other", label: _("Other") },
 ]
 
@@ -265,6 +264,20 @@ const settingsTabs = (): {
         }
     ]
 
+const HIDDEN_SETTINGS_TAB_IDS = new Set([
+    "agents",
+    "hr",
+    "webhooks",
+    "functions",
+    "file-sources",
+    "instructions",
+    "document-processors",
+    "ai-settings",
+    "push-notifications",
+])
+
+const visibleSettingsTabs = () => settingsTabs().filter((tab) => !HIDDEN_SETTINGS_TAB_IDS.has(tab.id))
+
 export type SettingsTabId = ReturnType<typeof settingsTabs>[number]["id"]
 
 const RavenSettingsDialog = () => {
@@ -291,7 +304,7 @@ const RavenSettingsDialog = () => {
                 <SettingsTabs>
                     {settingsTabGroups().map((group) => (
                         <SettingsTabGroup key={group.id} header={group.label}>
-                            {settingsTabs().filter((tab) => tab.group === group.id).map((tab) => {
+                            {visibleSettingsTabs().filter((tab) => tab.group === group.id).map((tab) => {
 
                                 if (tab.id === "profile") {
                                     return <SettingsTabItem key={tab.id} value={tab.id}
@@ -318,7 +331,7 @@ const RavenSettingsDialog = () => {
                     ))}
                 </SettingsTabs>
                 <SettingsPanels>
-                    {settingsTabs().map((tab) => (
+                    {visibleSettingsTabs().map((tab) => (
                         <SettingsPanel key={tab.id} value={tab.id}>
                             <Suspense fallback={<PanelLoading title={tab.panelTitle ?? tab.label} description={tab.description} />}>
                                 {/* Every tab has a panel component now (built-out ones and
