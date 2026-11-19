@@ -10,7 +10,7 @@ const MAX_RECENT = 5
 /** Common business documents shown before the server's alphabetical results. */
 export const COMMON_DOCUMENT_TYPES: ResultItem[] = [
 	{ value: "Sales Order", label: "Sales Order", description: "Selling" },
-	{ value: "Item", label: "Item", description: "Stock" },
+	{ value: "Item", label: "Item", description: "Products" },
 	{ value: "Customer", label: "Customer", description: "Selling" },
 	{ value: "Email Queue", label: "Email Queue", description: "Core" },
 	{ value: "Task", label: "Task", description: "Projects" },

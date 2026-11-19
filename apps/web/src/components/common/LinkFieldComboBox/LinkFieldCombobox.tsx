@@ -20,6 +20,7 @@ import _ from "@lib/translate";
 import ErrorBanner from "@components/ui/error-banner";
 import { Skeleton } from "@components/ui/skeleton";
 import MarkdownRenderer from "@components/ui/markdown";
+import { getLinkFieldSearchAPIPath } from "./linkSearch";
 
 export interface ResultItem {
     value: string,
@@ -169,7 +170,7 @@ const LinkFieldCombobox = ({
     placeholder = _("Select {0}", [doctype]),
     customQuery,
     searchfield,
-    searchAPIPath = "frappe.desk.search.search_link",
+    searchAPIPath = getLinkFieldSearchAPIPath(doctype),
     limit,
     useInForm,
     buttonClassName,
