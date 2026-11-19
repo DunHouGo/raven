@@ -16,7 +16,7 @@ type ChannelImageMenuProps = {
     canEdit: boolean
 }
 
-/** Lets channel administrators upload or remove the shared channel image. */
+/** 允许频道管理员上传或移除频道头像。 */
 export function ChannelImageMenu({ channel, canEdit }: ChannelImageMenuProps) {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [saving, setSaving] = useState(false)

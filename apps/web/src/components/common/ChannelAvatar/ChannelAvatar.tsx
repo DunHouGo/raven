@@ -10,7 +10,7 @@ type ChannelAvatarProps = {
     iconClassName?: string
 }
 
-/** Displays a custom channel image and falls back to the channel type icon. */
+/** 显示自定义频道头像，没有头像时回退到频道类型图标。 */
 export function ChannelAvatar({ type, image, className, iconClassName }: ChannelAvatarProps) {
     return (
         <Avatar className={cn("rounded-md", className)}>
