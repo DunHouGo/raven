@@ -8,6 +8,9 @@ export const getLinkFieldDisplayLabel = (
 	fallback = value,
 	language = typeof window === "undefined" ? "" : window.frappe?.boot?.lang || "",
 ): string => {
-	if (doctype !== "DocType" || value !== "Item") return fallback
-	return language.startsWith("zh") ? "商品" : "Product"
+	if (doctype !== "DocType") return fallback
+	if (value === "Item") return language.startsWith("zh") ? "商品" : "Product"
+	if (value === "Communication") return "Email"
+	if (value === "Wiki Document") return "Knowledge Base"
+	return fallback
 }

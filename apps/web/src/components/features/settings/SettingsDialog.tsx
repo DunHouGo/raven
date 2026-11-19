@@ -6,18 +6,14 @@ import { SettingsDialog, SettingsPanel, SettingsPanelContent, SettingsPanelDescr
 import { Spinner } from '@components/ui/spinner';
 import _ from '@lib/translate'
 import { useAtom } from 'jotai'
-import { BellDotIcon, BellRingIcon, BotIcon, BrainCogIcon, Building2Icon, CalendarSyncIcon, CpuIcon, FileTextIcon, FolderIcon, FunctionSquareIcon, IdCardIcon, InfoIcon, KeyboardIcon, PaletteIcon, PanelLeftIcon, SlidersHorizontalIcon, SmilePlusIcon, UserIcon, UsersIcon, WebhookIcon, ZapIcon } from 'lucide-react'
+import { BellDotIcon, BellRingIcon, BotIcon, BrainCogIcon, Building2Icon, CalendarSyncIcon, CpuIcon, FileTextIcon, FolderIcon, FunctionSquareIcon, IdCardIcon, InfoIcon, KeyboardIcon, PaletteIcon, PanelLeftIcon, SlidersHorizontalIcon, SmilePlusIcon, UsersIcon, WebhookIcon, ZapIcon } from 'lucide-react'
 import { useHotkeys } from 'react-hotkeys-hook';
-import useCurrentRavenUser from '@raven/lib/hooks/useCurrentRavenUser';
-import { UserAvatar } from '../message/UserAvatar';
-import { UserData } from '@db';
 
 // Panels are CODE-SPLIT: the dialog shell ships with the app (its atom +
 // hotkey must exist at boot), but a panel's chunk loads only when its tab is
 // first opened — only the active panel is mounted (Radix Tabs unmounts the
 // rest), so each Suspense below triggers exactly one load. Add new panels as
 // lazy() consts here — an eager import drags the panel into the main bundle.
-const Profile = lazy(() => import('./panels/Profile'));
 const Appearance = lazy(() => import('./panels/Appearance'));
 const Preferences = lazy(() => import('./panels/Preferences'));
 const CustomizeSidebarPanel = lazy(() =>
@@ -74,14 +70,6 @@ const settingsTabs = (): {
     description?: string
 }[] => [
         // Core settings
-        {
-            id: "profile",
-            group: "settings",
-            label: _("Profile"),
-            icon: UserIcon,
-            component: Profile,
-            description: _("Manage your Raven profile"),
-        },
         {
             id: "appearance",
             group: "settings",
@@ -290,42 +278,20 @@ const RavenSettingsDialog = () => {
         }
     }
 
-    useHotkeys("mod+slash", () => setOpenTab("profile"), { enableOnFormTags: true, preventDefault: true })
-
-    const { myProfile } = useCurrentRavenUser()
-
+    useHotkeys("mod+slash", () => setOpenTab("appearance"), { enableOnFormTags: true, preventDefault: true })
 
     return (
         <Dialog open={openTab !== ""} onOpenChange={onOpenChange}>
             <SettingsDialog
                 onClose={() => setOpenTab("")}
-                defaultValue={"profile"} value={openTab}
+                defaultValue={"appearance"} value={openTab}
                 onValueChange={(value) => setOpenTab(value as SettingsTabId)}>
                 <SettingsTabs>
                     {settingsTabGroups().map((group) => (
                         <SettingsTabGroup key={group.id} header={group.label}>
-                            {visibleSettingsTabs().filter((tab) => tab.group === group.id).map((tab) => {
-
-                                if (tab.id === "profile") {
-                                    return <SettingsTabItem key={tab.id} value={tab.id}
-                                        icon={<div className='flex items-center justify-center'><UserAvatar
-                                            avatarClassName='h-4.5 w-4.5'
-                                            user={{
-                                                name: myProfile?.name || "",
-                                                full_name: myProfile?.full_name || "",
-                                                user_image: myProfile?.user_image || "",
-                                                type: myProfile?.type || "",
-                                                availability_status: myProfile?.availability_status || "",
-                                                custom_status: myProfile?.custom_status || "",
-                                                enabled: myProfile?.enabled || 1,
-                                                first_name: myProfile?.first_name || "",
-                                            } as UserData} size="xs" showStatusIndicator={false} /></div>} label={tab.label} />
-                                }
-
-                                return (
-                                    <SettingsTabItem key={tab.id} value={tab.id} icon={<tab.icon />} label={tab.label} />
-                                )
-                            })}
+                            {visibleSettingsTabs().filter((tab) => tab.group === group.id).map((tab) => (
+                                <SettingsTabItem key={tab.id} value={tab.id} icon={<tab.icon />} label={tab.label} />
+                            ))}
                         </SettingsTabGroup>
 
                     ))}

@@ -49,7 +49,7 @@ export const AttachToDocumentDialog = ({
     // would keep querying whichever doctype was selected before.
     const doctype = useWatch({ control, name: "doctype" })
 
-    const { suggestedItems, addRecentlyUsedDocType } = useRecentlyUsedDocType()
+    const { recentlyUsedDocumentTypes, addRecentlyUsedDocType } = useRecentlyUsedDocType()
     const { call } = useContext(FrappeContext) as FrappeConfig
     const { call: attachFile, loading } = useFrappePostCall<{ message: string[] }>(
         "raven.api.raven_message.attach_file_to_document",
@@ -183,11 +183,11 @@ export const AttachToDocumentDialog = ({
                             label={_("Document Type")}
                             isRequired
                             doctype="DocType"
-                            suggestedItems={suggestedItems}
-                            filters={[
-                                ["issingle", "=", 0],
-                                ["istable", "=", 0],
-                            ]}
+                            hideCreate
+                            searchAPIPath="raven.api.document_type_search.search_document_types"
+                            searchParams={{ recent_doctypes: JSON.stringify(recentlyUsedDocumentTypes) }}
+                            searchResultsAsSuggestions
+                            skipMeta
                             rules={{ required: _("Document Type is required") }}
                         />
 
@@ -197,6 +197,8 @@ export const AttachToDocumentDialog = ({
                                 label={_("Document")}
                                 isRequired
                                 doctype={doctype}
+                                filters={doctype === "Communication" ? [["communication_medium", "=", "Email"]] : undefined}
+                                hideCreate
                                 placeholder={_("Select a document")}
                                 rules={{ required: _("Document is required") }}
                             />

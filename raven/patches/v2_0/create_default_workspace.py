@@ -8,7 +8,7 @@ def execute():
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
-			"workspace_name": "Raven",
+			"workspace_name": "Smart Promotion",
 			"type": "Public",
 		}
 	)

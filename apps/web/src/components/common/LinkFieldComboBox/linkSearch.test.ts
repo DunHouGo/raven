@@ -16,4 +16,9 @@ describe("getLinkFieldSearchAPIPath", () => {
 		expect(getLinkFieldDisplayLabel("DocType", "Item", "Item", "zh-CN")).toBe("商品")
 		expect(getLinkFieldDisplayLabel("DocType", "Customer", "Customer")).toBe("Customer")
 	})
+
+	it("uses translated labels for email and knowledge document types", () => {
+		expect(getLinkFieldDisplayLabel("DocType", "Communication")).toBe("Email")
+		expect(getLinkFieldDisplayLabel("DocType", "Wiki Document")).toBe("Knowledge Base")
+	})
 })

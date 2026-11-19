@@ -45,6 +45,7 @@ import { USER_DATE_FORMAT } from "@lib/date"
 import { DocumentPrintDialog } from "./DocumentPrintDialog"
 import _ from "@lib/translate"
 import { Separator } from "@components/ui/separator"
+import { getLinkFieldDisplayLabel } from "@components/common/LinkFieldComboBox/linkSearch"
 
 // For best-effort parsing of server-formatted dates back into dayjs (tooltips).
 dayjs.extend(customParseFormat)
@@ -261,7 +262,7 @@ const DocumentLinkSkeleton = ({ meta }: { meta?: DoctypeMeta }) => {
 const DocumentLinkFallback = ({ doctype, docname, replaced }: { doctype: string; docname: string; replaced?: boolean }) => (
     <div className={`${cardSurface} flex items-center gap-2`}>
         <Badge variant="outline" theme="gray">
-            {doctype}
+            {_(getLinkFieldDisplayLabel("DocType", doctype))}
         </Badge>
         {replaced ? (
             <span className="truncate text-p-sm text-ink-gray-7">{docname}</span>
@@ -377,7 +378,7 @@ const DocumentCard = ({
                 )}
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <div className="flex items-center gap-1.5 text-p-xs text-ink-gray-5">
-                        <span>{doctype}</span>
+                        <span>{_(getLinkFieldDisplayLabel("DocType", doctype))}</span>
                         <Separator orientation="vertical" className="bg-outline-gray-2 data-[orientation=vertical]:h-3.5" />
                         {preview.id && (
                             <button
@@ -407,12 +408,12 @@ const DocumentCard = ({
                         <TooltipTrigger asChild>
                             {/* A real link, so middle-click and long-press work as for any link. */}
                             <Button variant="ghost" size="sm" isIconButton asChild>
-                                <a href={route} target="_blank" rel="noreferrer" aria-label={_("Open")}>
+                                <a href={route} target="_blank" rel="noreferrer" aria-label={_("Open document")}>
                                     <ExternalLinkIcon />
                                 </a>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>{_("Open")}</TooltipContent>
+                        <TooltipContent>{_("Open document")}</TooltipContent>
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -494,7 +495,7 @@ export const DocumentPreviewSummary = ({ doctype, docname }: { doctype: string; 
         return (
             <div className="flex items-center gap-2">
                 <Badge variant="subtle" theme="gray">
-                    {doctype}
+                    {_(getLinkFieldDisplayLabel("DocType", doctype))}
                 </Badge>
                 <span className="truncate text-p-sm text-ink-gray-7">{docname}</span>
             </div>
@@ -514,7 +515,7 @@ export const DocumentPreviewSummary = ({ doctype, docname }: { doctype: string; 
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <div className="flex items-center gap-1.5">
                         <Badge variant="subtle" theme="gray">
-                            {doctype}
+                            {_(getLinkFieldDisplayLabel("DocType", doctype))}
                         </Badge>
                         {preview.id && <span className="truncate text-p-xs text-ink-gray-5">{preview.id}</span>}
                     </div>
@@ -545,7 +546,7 @@ export const DocumentLinkInline = ({
     <p className={cn("flex min-w-0 items-center gap-1 text-sm text-ink-gray-5", className)}>
         <FileBoxIcon className="size-3.5 shrink-0" />
         <span className="truncate">
-            {doctype} · {docname}
+            {_(getLinkFieldDisplayLabel("DocType", doctype))} · {docname}
         </span>
     </p>
 )

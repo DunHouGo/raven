@@ -121,7 +121,7 @@ export const WebhookConditionForm = () => {
                             <SelectLabel>{_("Channel Type")}</SelectLabel>
                             <SelectItem value="Public">{_("Public")}</SelectItem>
                             <SelectItem value="Private">{_("Private")}</SelectItem>
-                            <SelectItem value="Open">{_("Open")}</SelectItem>
+                            <SelectItem value="Open">{_("Open to everyone")}</SelectItem>
                             <SelectItem value="DM">{_("Direct Message")}</SelectItem>
                             <SelectItem value="Self Message">{_("Self Message")}</SelectItem>
                         </SelectGroup>

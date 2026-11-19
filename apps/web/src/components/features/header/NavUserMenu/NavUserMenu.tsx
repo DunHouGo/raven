@@ -1,27 +1,27 @@
-import { LogOut, Bell, SettingsIcon, Loader2, CreditCard } from "lucide-react"
-import { useLogout } from "@hooks/useLogout"
+import { Bell, SettingsIcon, CreditCard, Check } from "lucide-react"
 import { UserAvatar } from "@components/features/message/UserAvatar"
 import { Button } from "@components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu"
 import { availabilityOptions, useSetAvailability, type AvailabilityStatus } from "@hooks/useSetAvailability"
 import { getStatusIndicatorColor } from "@components/features/message/UserAvatar"
 import { cn } from "@lib/utils"
-import { CircleDot } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip"
 import _ from "@lib/translate"
 import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
 import { useUserCookieData } from "@hooks/useUserCookieData"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { UserData } from "@db"
 import { useSetAtom } from "jotai"
 import { settingsDialogOpenTab } from "@components/features/settings/settingsDialogAtom"
 import { disablePush, enablePush, isPushEnabled } from "@lib/push"
 import { toast } from "sonner"
 import { getErrorMessage } from "@lib/frappe"
-import { FrappeError } from "frappe-react-sdk"
+import { useFrappePostCall, type FrappeError } from "frappe-react-sdk"
 import { useIsPushNotificationEnabled } from "@hooks/fetchers/useIsPushNotificationEnabled"
 import { Spinner } from "@components/ui/spinner"
 import { useCloudSettings } from "@hooks/useCloudSettings"
+import { Input } from "@components/ui/input"
+import { errorResponseToast } from "@components/ui/error-banner"
 
 const NavUserMenu = () => {
 
@@ -46,8 +46,6 @@ const NavUserMenu = () => {
             first_name: userCookieData.full_name?.split(' ')?.[0],
         }
     }, [myProfile, userCookieData])
-
-    const { logout, isLoggingOut } = useLogout()
 
     const isPushAvailable = useIsPushNotificationEnabled()
 
@@ -80,10 +78,10 @@ const NavUserMenu = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" isIconButton>
+                <Button variant="ghost" size="sm" isIconButton aria-label={_("Your Profile")}>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <UserAvatar user={userData} size="md" className="rounded-lg" showStatusIndicator={true} showBotIndicator={false} addColoredFallback={false} />
+                            <UserAvatar user={userData} size="md" className="rounded-full" showStatusIndicator={true} showBotIndicator={false} addColoredFallback={false} />
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>{_("Your Profile")}</p>
@@ -92,7 +90,7 @@ const NavUserMenu = () => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                className="w-72 min-w-56"
                 side="right"
                 align="end"
                 sideOffset={12}
@@ -100,7 +98,7 @@ const NavUserMenu = () => {
             >
                 <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 p-1.5 text-left text-sm">
-                        <UserAvatar user={userData} size="md" className="rounded-lg" showStatusIndicator={true} showBotIndicator={false} addColoredFallback={false} />
+                        <UserAvatar user={userData} size="md" className="rounded-full" showStatusIndicator={true} showBotIndicator={false} addColoredFallback={false} />
                         <div className="flex flex-col gap-0.5 text-left text-sm">
                             <span className="truncate font-semibold text-ink-gray-8">{userData.full_name}</span>
                             <span className="truncate text-xs text-ink-gray-5">{userData.name}</span>
@@ -108,8 +106,11 @@ const NavUserMenu = () => {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <StatusSubMenu />
-                <DropdownMenuItem onClick={() => setOpenSettingsDialog("profile")}>
+                <CustomStatusEditor />
+                <DropdownMenuSeparator />
+                <AvailabilityPicker />
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setOpenSettingsDialog("appearance")}>
                     <SettingsIcon />
                     <span>{_("Settings")}</span>
                 </DropdownMenuItem>
@@ -121,47 +122,84 @@ const NavUserMenu = () => {
                     <Bell />
                     <span>{pushOn ? _("Disable Notifications") : _("Enable Notifications")}</span>
                 </DropdownMenuItem>}
-                <DropdownMenuSeparator />
-                {/* preventDefault keeps the menu open (spinner visible) while logout
-                    runs; success hard-redirects to /login, failure toasts. */}
-                <DropdownMenuItem
-                    variant="destructive"
-                    disabled={isLoggingOut}
-                    onSelect={(e) => { e.preventDefault(); logout() }}
-                >
-                    {isLoggingOut ? <Spinner /> : <LogOut />}
-                    <span>{isLoggingOut ? _("Logging out…") : _("Log out")}</span>
-                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
 }
 
-/** Quick availability switcher — the same options (and write path) as the
- *  profile form, one hover away from the avatar. */
-const StatusSubMenu = () => {
+/** Edit the short status message directly from the avatar menu. */
+const CustomStatusEditor = () => {
+    const { myProfile, mutate } = useCurrentRavenUser()
+    const { call, loading } = useFrappePostCall("frappe.client.set_value")
+    const [value, setValue] = useState(myProfile?.custom_status ?? "")
+
+    useEffect(() => setValue(myProfile?.custom_status ?? ""), [myProfile?.custom_status])
+
+    const save = async () => {
+        const status = value.trim()
+        if (!myProfile?.name || status === (myProfile.custom_status ?? "")) return
+        try {
+            await call({ doctype: "Raven User", name: myProfile.name, fieldname: "custom_status", value: status })
+            await mutate()
+            toast.success(_("Status updated"))
+        } catch (error) {
+            errorResponseToast(_("Could not update status"), error as FrappeError)
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-2 px-2 py-1.5">
+            <Input
+                aria-label={_("Status message")}
+                placeholder={_("Set a status")}
+                value={value}
+                onChange={(event) => setValue(event.target.value)}
+                onKeyDown={(event) => {
+                    event.stopPropagation()
+                    if (event.key === "Enter") {
+                        event.preventDefault()
+                        void save()
+                    }
+                }}
+                className="h-9 min-w-0"
+            />
+            <Button
+                type="button"
+                variant="subtle"
+                size="sm"
+                isIconButton
+                aria-label={_("Save status")}
+                title={_("Save status")}
+                disabled={loading || value.trim() === (myProfile?.custom_status ?? "")}
+                onClick={save}
+            >
+                {loading ? <Spinner /> : <Check />}
+            </Button>
+        </div>
+    )
+}
+
+/** Show every availability choice in the avatar menu without a nested submenu. */
+const AvailabilityPicker = () => {
     const { availability, setAvailability } = useSetAvailability()
 
     return (
-        <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-                <CircleDot />
-                <span>{_("Status")}</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-                <DropdownMenuRadioGroup
-                    value={availability}
-                    onValueChange={(value) => setAvailability(value as AvailabilityStatus)}
-                >
-                    {availabilityOptions().map((option) => (
-                        <DropdownMenuRadioItem key={option.value} value={option.value}>
-                            <span className={cn("size-2 rounded-full", getStatusIndicatorColor(option.value))} />
-                            {option.label}
-                        </DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <>
+            <DropdownMenuLabel className="text-xs text-ink-gray-5">{_("Availability")}</DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+                value={availability}
+                onValueChange={(value) => setAvailability(value as AvailabilityStatus)}
+            >
+                {availabilityOptions().map((option) => (
+                    <DropdownMenuRadioItem key={option.value} value={option.value}>
+                            <span className="flex size-4 shrink-0 items-center justify-center">
+                                <span className={cn("size-2 rounded-full", getStatusIndicatorColor(option.value))} />
+                            </span>
+                        {option.label}
+                    </DropdownMenuRadioItem>
+                ))}
+            </DropdownMenuRadioGroup>
+        </>
     )
 }
 

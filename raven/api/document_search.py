@@ -34,7 +34,7 @@ ITEM_SEARCH_FIELDS = (
 
 
 def get_item_search_fields(meta: Any) -> list[str]:
-	"""Return searchable Item text fields supported by this site's metadata."""
+	"""返回当前站点元数据允许搜索的商品文本字段。"""
 	permitted_fields = set(
 		meta.get_permitted_fieldnames(permission_type="read", with_virtual_fields=False)
 	)
@@ -50,7 +50,7 @@ def get_item_search_fields(meta: Any) -> list[str]:
 	]
 
 
-def _parse_filters(filters: str | list | dict | None) -> list[list]:
+def _parse_filters(filters: str | list[Any] | dict[str, Any] | None) -> list[list[Any]]:
 	if not filters:
 		return []
 	parsed = frappe.parse_json(filters) if isinstance(filters, str) else filters
@@ -77,7 +77,7 @@ def _get_tagged_item_names(txt: str, limit: int) -> list[str]:
 def search_items(
 	txt: str = "", page_length: int = 20, filters: str | list | dict | None = None
 ) -> list[dict[str, str]]:
-	"""Search readable products by SKU, product details, and document tags."""
+	"""按 SKU、商品信息和单据标签搜索当前用户可读取的商品。"""
 	frappe.has_permission("Item", "read", throw=True)
 	query = (txt or "").strip()
 	limit = max(1, min(int(page_length or 20), 50))

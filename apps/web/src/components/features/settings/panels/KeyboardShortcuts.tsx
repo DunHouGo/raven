@@ -51,7 +51,7 @@ export const KeyboardShortcuts = () => {
                 {
                     keys: <KbdGroup><Mod /><Key>/</Key></KbdGroup>,
                     icon: <SettingsIcon />, label: _("Settings"),
-                    description: _("Open your profile and settings."),
+                    description: _("Open settings."),
                 },
                 {
                     keys: <Key>Esc</Key>,

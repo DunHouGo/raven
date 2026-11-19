@@ -6,7 +6,7 @@ import _ from "@lib/translate"
 
 /** The values `Raven User.availability_status` can hold (besides the "" default). */
 export const availabilityOptions = () => [
-    { value: "Available", label: _("Available") },
+    { value: "Available", label: _("Online") },
     { value: "Away", label: _("Away") },
     { value: "Do not disturb", label: _("Do not disturb") },
     { value: "Invisible", label: _("Invisible") },

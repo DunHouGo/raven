@@ -18,7 +18,7 @@ interface ChannelTypeSelectorProps {
 const channelTypes = (): { value: RavenChannel['type']; label: string; description: string }[] => [
     { value: 'Public', label: _('Public'), description: _('Anyone can view but is not a member by default') },
     { value: 'Private', label: _('Private'), description: _('Join by invitation only') },
-    { value: 'Open', label: _('Open'), description: _('Everyone is a member') },
+    { value: 'Open', label: _('Open to everyone'), description: _('Everyone is a member') },
 ]
 
 /**

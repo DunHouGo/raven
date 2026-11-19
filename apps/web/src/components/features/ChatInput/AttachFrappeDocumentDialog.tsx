@@ -14,6 +14,7 @@ import {
     DialogTrigger,
 } from '@components/ui/dialog'
 import { LinkFormField } from '@components/ui/form-elements'
+import { getLinkFieldDisplayLabel } from '@components/common/LinkFieldComboBox/linkSearch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip'
 import { useIsMobile } from '@hooks/use-mobile'
 import { useRecentlyUsedDocType } from '@hooks/useRecentlyUsedDocType'
@@ -49,8 +50,7 @@ const AttachFrappeDocumentDialog = ({ channelID, open, onOpenChange, hideTrigger
     const setOpen = onOpenChange ?? setInternalOpen
 
     const setLinkedDocument = useSetAtom(linkedDocumentAtom(channelID))
-    const { suggestedItems, addRecentlyUsedDocType } = useRecentlyUsedDocType()
-
+    const { recentlyUsedDocumentTypes, addRecentlyUsedDocType } = useRecentlyUsedDocType()
     const methods = useForm<AttachDocumentForm>({ defaultValues: { doctype: '', docname: '' } })
     const { control, handleSubmit, reset, setValue } = methods
     const doctype = useWatch({ control, name: 'doctype' })
@@ -117,11 +117,11 @@ const AttachFrappeDocumentDialog = ({ channelID, open, onOpenChange, hideTrigger
                             label={_("Document Type")}
                             isRequired
                             doctype="DocType"
-                            suggestedItems={suggestedItems}
-                            filters={[
-                                ["issingle", "=", 0],
-                                ["istable", "=", 0],
-                            ]}
+                            hideCreate
+                            searchAPIPath="raven.api.document_type_search.search_document_types"
+                            searchParams={{ recent_doctypes: JSON.stringify(recentlyUsedDocumentTypes) }}
+                            searchResultsAsSuggestions
+                            skipMeta
                             rules={{ required: _("Document Type is required") }}
                         />
 
@@ -131,6 +131,8 @@ const AttachFrappeDocumentDialog = ({ channelID, open, onOpenChange, hideTrigger
                                 label={_("Document")}
                                 isRequired
                                 doctype={doctype}
+                                filters={doctype === "Communication" ? [["communication_medium", "=", "Email"]] : undefined}
+                                hideCreate
                                 rules={{ required: _("Document is required") }}
                             />
                         )}
@@ -194,7 +196,7 @@ const LinkedDocumentChip = ({ channelID, document }: { channelID: string; docume
                                     <h4 className="md:text-xs-medium mb-0.5 text-sm-medium leading-snug text-ink-gray-8 truncate">
                                         {title}
                                     </h4>
-                                    <p className="md:text-xs text-sm text-ink-gray-5 truncate">{document.doctype}</p>
+                                    <p className="md:text-xs text-sm text-ink-gray-5 truncate">{_(getLinkFieldDisplayLabel("DocType", document.doctype))}</p>
                                 </div>
                             </div>
                         </HoverCardTrigger>

@@ -4,7 +4,6 @@ import { commandMenuOpenAtom } from './atoms'
 import { useMemo } from 'react'
 import _ from '@lib/translate'
 import {
-    User,
     Palette,
     SlidersHorizontal,
     Building2,
@@ -14,7 +13,6 @@ import {
 import { settingsDialogOpenTab } from '../settings/settingsDialogAtom'
 
 const ITEMS = [
-    { value: 'profile', label: 'Profile', icon: User },
     { value: 'appearance', label: 'Appearance', icon: Palette },
     { value: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
     { value: 'workspaces', label: 'Workspaces', icon: Building2 },

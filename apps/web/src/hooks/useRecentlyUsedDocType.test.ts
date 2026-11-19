@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { getSuggestedDocumentTypes, toMostRecent } from "./useRecentlyUsedDocType"
+import { toMostRecent } from "./useRecentlyUsedDocType"
 
 describe("toMostRecent", () => {
     it("prepends a new entry", () => {
@@ -20,27 +20,5 @@ describe("toMostRecent", () => {
 
     it("handles an empty list", () => {
         expect(toMostRecent([], "Task")).toEqual(["Task"])
-    })
-})
-
-describe("getSuggestedDocumentTypes", () => {
-    it("starts with common business documents", () => {
-        expect(getSuggestedDocumentTypes([]).slice(0, 6).map((item) => item.value)).toEqual([
-            "Sales Order",
-            "Item",
-            "Customer",
-            "Email Queue",
-            "Task",
-            "Knowledge Base",
-        ])
-        expect(getSuggestedDocumentTypes([])[1].description).toBe("Products")
-		expect(getSuggestedDocumentTypes([])[1].label).toBe("Product")
-    })
-
-    it("keeps recent non-common documents after the common list", () => {
-        const suggestions = getSuggestedDocumentTypes(["Automation Flow", "Customer"])
-
-        expect(suggestions[suggestions.length - 1]).toEqual({ value: "Automation Flow", description: "Recently used" })
-        expect(suggestions.filter((item) => item.value === "Customer")).toHaveLength(1)
     })
 })

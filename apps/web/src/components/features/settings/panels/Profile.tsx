@@ -25,7 +25,7 @@ import _ from "@lib/translate"
 const FORM_ID = "settings-profile-form"
 
 const statusOptions = () => [
-    { value: "Available", label: _("Available") },
+    { value: "Available", label: _("Online") },
     { value: "Away", label: _("Away") },
     { value: "Do not disturb", label: _("Do not disturb") },
     { value: "Invisible", label: _("Invisible") },

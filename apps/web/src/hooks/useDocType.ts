@@ -8,7 +8,12 @@ type FrappeWindow = Window & {
     frappe?: { model?: { add_to_locals?: (doc: unknown) => void } }
 }
 
-export const useDocType = (doctype: string, with_parent: 0 | 1 = 1, cached_timestamp?: Date) => {
+export const useDocType = (
+    doctype: string,
+    with_parent: 0 | 1 = 1,
+    cached_timestamp?: Date,
+    enabled: boolean = true,
+) => {
     const w = typeof window !== "undefined" ? (window as FrappeWindow) : undefined
     const localData = w?.locals?.["DocType"]?.[doctype] ?? null
 
@@ -16,7 +21,7 @@ export const useDocType = (doctype: string, with_parent: 0 | 1 = 1, cached_times
         doctype: doctype,
         with_parent: with_parent,
         cached_timestamp: cached_timestamp ?? null,
-    }, localData || !doctype ? null : undefined, {
+    }, localData || !doctype || !enabled ? null : undefined, {
         onSuccess: (data) => {
             const addToLocals = w?.frappe?.model?.add_to_locals
             if (data && addToLocals) {
@@ -31,6 +36,6 @@ export const useDocType = (doctype: string, with_parent: 0 | 1 = 1, cached_times
     return {
         data: localData || (data?.docs?.[0] ?? null),
         error,
-        isLoading: localData ? false : isLoading,
+        isLoading: localData || !enabled ? false : isLoading,
     }
 }

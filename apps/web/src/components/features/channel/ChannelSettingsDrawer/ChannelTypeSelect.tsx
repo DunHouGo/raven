@@ -33,7 +33,7 @@ const CHANNEL_TYPES: RavenChannel["type"][] = ["Public", "Private", "Open"];
 const typeLabels = (): Record<RavenChannel["type"], string> => ({
   Public: _("Public"),
   Private: _("Private"),
-  Open: _("Open"),
+  Open: _("Open to everyone"),
 });
 
 /**

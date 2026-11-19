@@ -145,6 +145,12 @@ export interface LinkFieldComboboxProps {
      * simply give way to real results as soon as the user types.
      */
     suggestedItems?: ResultItem[],
+    /** Extra request args for a custom search endpoint. */
+    searchParams?: Record<string, string | number | boolean>,
+    /** Render empty-query API results under Suggested and wait for input to show search results. */
+    searchResultsAsSuggestions?: boolean,
+    /** Skip the metadata request when a custom endpoint already knows the field shape. */
+    skipMeta?: boolean,
     value?: string,
     onChange: (value: string) => void,
     /** If true, the component will be wrapped in a FormControl component */
@@ -167,6 +173,9 @@ const LinkFieldCombobox = ({
     hideCreate = false,
     filterFn,
     suggestedItems,
+    searchParams,
+    searchResultsAsSuggestions = false,
+    skipMeta = false,
     placeholder,
     customQuery,
     searchfield,
@@ -181,7 +190,7 @@ const LinkFieldCombobox = ({
     const pageLimit = useMemo(() => limit || getSystemDefault('link_field_results_limit') || 20, [limit])
 
     /** Load the Doctype meta so that we can determine the search fields + the name of the title field */
-    const { data: meta } = useDocType(doctype)
+    const { data: meta } = useDocType(doctype, 1, undefined, !skipMeta)
 
     const userCanCreate = useMemo(() => canCreateDocument(doctype), [doctype])
 
@@ -226,10 +235,11 @@ const LinkFieldCombobox = ({
         doctype,
         docname: value,
         with_site_url: false,
-    }, value ? `document_link::${doctype}::${value}` : null)
+    }, value && !skipMeta ? `document_link::${doctype}::${value}` : null)
     const documentLink = documentLinkData?.message
 
     const { data, error, isLoading } = useFrappeGetCall<{ message: ResultItem[] }>(searchAPIPath, {
+        ...searchParams,
         doctype,
         txt: searchInput,
         page_length: pageLimit,
@@ -265,6 +275,10 @@ const LinkFieldCombobox = ({
                 key += `_${searchfield}`
             }
 
+            if (searchParams) {
+                key += `_${JSON.stringify(searchParams)}`
+            }
+
             return key
 
         }
@@ -293,6 +307,7 @@ const LinkFieldCombobox = ({
     }
 
     const items = filterFn ? data?.message?.slice(0, 50).filter((item) => filterFn(item, searchInput)) : data?.message
+    const suggestionResults = !searchInput && searchResultsAsSuggestions ? items : suggestedItems
 
     // Shared by the "Recent" group and the search results — keeps both lists on the
     // same row treatment and the same selected-row check.
@@ -382,9 +397,9 @@ const LinkFieldCombobox = ({
                     {/* Hidden while results load — the skeleton below owns that state.
                         A bare "Loading..." line read as a hang in the drawer sheet. */}
                     {!isLoading && <CommandEmpty>{_("No results found.")}</CommandEmpty>}
-                    {!searchInput && suggestedItems && suggestedItems.length > 0 && (
+                    {!searchInput && suggestionResults && suggestionResults.length > 0 && (
                         <CommandGroup heading={_("Suggested")}>
-                            {suggestedItems.map((item) => renderItem(item, "recent-"))}
+                            {suggestionResults.map((item) => renderItem(item, "suggested-"))}
                         </CommandGroup>
                     )}
                     {isLoading && !items?.length && (
@@ -397,7 +412,7 @@ const LinkFieldCombobox = ({
                         </div>
                     )}
                     <CommandGroup>
-                        {items?.map((result) => renderItem(result))}
+                        {(!searchResultsAsSuggestions || Boolean(searchInput)) && items?.map((result) => renderItem(result))}
                         {userCanCreate && !hideCreate && (
                             <CommandItem asChild className={cn(LINK_ITEM_STYLES, "justify-between")}>
                                 {/* No equivalent endpoint exists for "create a new document" the

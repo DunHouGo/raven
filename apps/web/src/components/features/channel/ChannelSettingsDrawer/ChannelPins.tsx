@@ -133,7 +133,7 @@ const ChannelPins = ({ channelID }: { channelID: string }) => {
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    {_("Unpin")}
+                                                    {_("Unpin message")}
                                                 </TooltipContent>
                                             </Tooltip>
                                         )}

@@ -574,7 +574,7 @@ const DownloadCard = ({ attachment, isMobile }: { attachment: Attachment; isMobi
                 <p className="text-sm text-ink-gray-5">{_("No preview available")}</p>
             </div>
             <Button variant="solid" theme="gray" onClick={action}>
-                {openInTab ? _("Open") : import.meta.env.VITE_NATIVE ? _("Share") : _("Download")}
+                {openInTab ? _("Open in new tab") : import.meta.env.VITE_NATIVE ? _("Share") : _("Download")}
             </Button>
         </div>
     )

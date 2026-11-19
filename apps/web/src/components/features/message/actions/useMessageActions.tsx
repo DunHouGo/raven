@@ -338,7 +338,7 @@ export const useMessageActions = (
         if (canInteract && parentChannel && onServer) {
             organize.push({
                 id: "pin",
-                label: isPinned ? _("Unpin") : _("Pin"),
+                label: isPinned ? _("Unpin message") : _("Pin message"),
                 icon: isPinned ? PinOff : Pin,
                 onSelect: () => {
                     // Optimistically add/remove the id in the channel's pinned set; revert on

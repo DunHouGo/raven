@@ -126,7 +126,7 @@ export const PollDrawer: React.FC<PollDrawerProps> = ({ messageID, onClose }) =>
             const formattedDate = endDateObj.format(timeFormat === "12-hour" ? "MMM D, h:mma" : "MMM D, HH:mm")
             return { text: _("Open until {0}", [formattedDate]), theme: "gray" }
         } catch {
-            return { text: _("Open"), theme: "gray" }
+            return { text: _("Poll is open"), theme: "gray" }
         }
     })()
 

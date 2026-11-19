@@ -220,7 +220,7 @@ const ChannelLinkCard = ({ workspaceID, channelID, to }: { workspaceID: string; 
     const workspace = workspaces.find((entry) => entry.name === workspaceID)
 
     return (
-        <CardShell to={to} action={_("Open")}>
+        <CardShell to={to} action={_("Open conversation")}>
             <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-surface-gray-3">
                 <ChannelIcon type={channel.type} className="size-5 text-ink-gray-7" />
             </span>
@@ -242,7 +242,7 @@ const DMLinkCard = ({ channelID, to }: { channelID: string; to: string }) => {
     if (!channel || channel.is_direct_message !== 1) return null
 
     return (
-        <CardShell to={to} action={_("Open")}>
+        <CardShell to={to} action={_("Open conversation")}>
             {peer ? (
                 <UserAvatar user={peer} size="md" className="shrink-0" />
             ) : (
