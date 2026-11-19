@@ -25,6 +25,7 @@ class RavenChannel(Document):
 		from raven.raven.doctype.raven_pinned_messages.raven_pinned_messages import RavenPinnedMessages
 
 		channel_description: DF.SmallText | None
+		channel_image: DF.AttachImage | None
 		channel_name: DF.Data
 		dm_user_1: DF.Link | None
 		dm_user_2: DF.Link | None

@@ -2,7 +2,7 @@ import {
     Collapsible,
     CollapsibleContent,
 } from '@components/ui/collapsible'
-import { ChannelIcon } from '@components/common/ChannelIcon/ChannelIcon'
+import { ChannelAvatar } from '@components/common/ChannelAvatar/ChannelAvatar'
 import { ChannelSidebarData } from '@raven/lib/hooks/useGroupedChannels'
 import { useEffect, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso'
@@ -171,7 +171,12 @@ const SortableGroup = ({
 
 const PreviewRow = ({ channel }: { channel: ChannelSidebarData['ungroupedChannels'][number] }) => (
     <div className="flex h-7 min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 text-sm text-ink-gray-7">
-        <ChannelIcon type={channel.type || "Public"} className="h-4 w-4 shrink-0" />
+        <ChannelAvatar
+            type={channel.type || "Public"}
+            image={channel.channel_image}
+            className="size-4 rounded-sm shrink-0"
+            iconClassName="size-3"
+        />
         {/* leading-snug to match ChannelSidebar's ChannelItem — the preview has to
             clip descenders exactly the way the real sidebar does, or it isn't one. */}
         <span className="truncate leading-snug">{channel.channel_name}</span>

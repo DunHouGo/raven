@@ -1,4 +1,5 @@
 import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon"
+import { ChannelAvatar } from "@components/common/ChannelAvatar/ChannelAvatar"
 import useCreateHotkey from "@hooks/useCreateHotkey"
 import { ListView, type ListViewColumnMeta, type SortingState } from "@components/ui/list-view"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -48,7 +49,7 @@ export const Channels = () => {
     const { onClose } = useSettingsDialog()
 
     const filteredChannels = useMemo<ChannelListItem[]>(() => {
-        let filteredChannels: ChannelListItem[] = channels.filter((channel) => {
+        const filteredChannels: ChannelListItem[] = channels.filter((channel) => {
             const myChannelsMatch = filters?.myChannels === 'All Channels' || (filters?.myChannels === 'Joined Channels' && !!channel.member_id) || (filters?.myChannels === 'Other Channels' && !channel.member_id);
 
             const channelTypeMatch = filters?.channelType === 'All Types' || channel.type === filters?.channelType;
@@ -95,7 +96,12 @@ export const Channels = () => {
                     navigate(`/${row.original.workspace}/${row.original.name}`)
                     onClose?.()
                 }}>
-                    <ChannelIcon type={row.original.type || "Public"} className="w-4 h-4 shrink-0" />
+                    <ChannelAvatar
+                        type={row.original.type || "Public"}
+                        image={row.original.channel_image}
+                        className="size-4 rounded-sm shrink-0"
+                        iconClassName="size-3"
+                    />
                     <span className='font-medium truncate'>{row.original.channel_name}</span>
                 </div>
             )
