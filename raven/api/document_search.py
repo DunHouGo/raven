@@ -35,12 +35,17 @@ ITEM_SEARCH_FIELDS = (
 
 def get_item_search_fields(meta: Any) -> list[str]:
 	"""Return searchable Item text fields supported by this site's metadata."""
+	permitted_fields = set(
+		meta.get_permitted_fieldnames(permission_type="read", with_virtual_fields=False)
+	)
 	return [
 		"name",
 		*[
 			fieldname
 			for fieldname in ITEM_SEARCH_FIELDS
-			if (field := meta.get_field(fieldname)) and field.fieldtype in ITEM_SEARCH_FIELD_TYPES
+			if fieldname in permitted_fields
+			and (field := meta.get_field(fieldname))
+			and field.fieldtype in ITEM_SEARCH_FIELD_TYPES
 		],
 	]
 
@@ -77,21 +82,35 @@ def search_items(
 	query = (txt or "").strip()
 	limit = max(1, min(int(page_length or 20), 50))
 	meta = frappe.get_meta("Item")
+	permitted_fields = set(
+		meta.get_permitted_fieldnames(permission_type="read", with_virtual_fields=False)
+	)
 	search_fields = get_item_search_fields(meta)
-	item_filters = _parse_filters(filters)
-	if meta.has_field("disabled"):
+	item_filters = []
+	for condition in _parse_filters(filters):
+		if not isinstance(condition, list) or not condition:
+			continue
+		fieldname = condition[1] if len(condition) >= 4 and condition[0] == "Item" else condition[0]
+		if fieldname in permitted_fields:
+			item_filters.append(condition)
+	if "disabled" in permitted_fields:
 		item_filters.append(["Item", "disabled", "=", 0])
-	if meta.has_field("has_variants"):
+	if "has_variants" in permitted_fields:
 		item_filters.append(["Item", "has_variants", "=", 0])
 
 	or_filters = [["Item", fieldname, "like", f"%{query}%"] for fieldname in search_fields] if query else []
+	result_fields = [
+		fieldname
+		for fieldname in ["name", "item_name", "description"]
+		if fieldname == "name" or fieldname in permitted_fields
+	]
 	items = frappe.get_list(
 		"Item",
 		filters=item_filters,
 		or_filters=or_filters,
-		fields=["name", "item_name", "description"],
+		fields=result_fields,
 		page_length=limit,
-		order_by="item_name asc, name asc",
+		order_by=f"{'item_name asc, ' if 'item_name' in permitted_fields else ''}name asc",
 	)
 
 	matched_names = _get_tagged_item_names(query, limit)
@@ -99,9 +118,9 @@ def search_items(
 		tag_items = frappe.get_list(
 			"Item",
 			filters=[*item_filters, ["Item", "name", "in", matched_names]],
-			fields=["name", "item_name", "description"],
+			fields=result_fields,
 			page_length=limit,
-			order_by="item_name asc, name asc",
+			order_by=f"{'item_name asc, ' if 'item_name' in permitted_fields else ''}name asc",
 		)
 		known_names = {item.name for item in tag_items}
 		items = [*tag_items, *(item for item in items if item.name not in known_names)]
@@ -109,8 +128,11 @@ def search_items(
 	return [
 		{
 			"value": item.name,
-			"label": item.item_name or item.name,
-			"description": " · ".join(value for value in [item.name, item.description] if value) or item.name,
+			"label": item.get("item_name") or item.name,
+			"description": " · ".join(
+				value for value in [item.name, item.get("description")] if value
+			)
+			or item.name,
 		}
 		for item in items[:limit]
 	]
