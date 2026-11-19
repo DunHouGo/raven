@@ -377,7 +377,7 @@ const LinkFieldCombobox = ({
                         A bare "Loading..." line read as a hang in the drawer sheet. */}
                     {!isLoading && <CommandEmpty>{_("No results found.")}</CommandEmpty>}
                     {!searchInput && suggestedItems && suggestedItems.length > 0 && (
-                        <CommandGroup heading={_("Recent")}>
+                        <CommandGroup heading={_("Suggested")}>
                             {suggestedItems.map((item) => renderItem(item, "recent-"))}
                         </CommandGroup>
                     )}
