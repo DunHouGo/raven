@@ -34,6 +34,7 @@ describe("getSuggestedDocumentTypes", () => {
             "Knowledge Base",
         ])
         expect(getSuggestedDocumentTypes([])[1].description).toBe("Products")
+		expect(getSuggestedDocumentTypes([])[1].label).toBe("Product")
     })
 
     it("keeps recent non-common documents after the common list", () => {

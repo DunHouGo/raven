@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { getLinkFieldSearchAPIPath } from "./linkSearch"
+import { getLinkFieldDisplayLabel, getLinkFieldSearchAPIPath } from "./linkSearch"
 
 describe("getLinkFieldSearchAPIPath", () => {
 	it("uses product search for Item links", () => {
@@ -8,5 +8,12 @@ describe("getLinkFieldSearchAPIPath", () => {
 
 	it("keeps Frappe link search for other doctypes", () => {
 		expect(getLinkFieldSearchAPIPath("Customer")).toBe("frappe.desk.search.search_link")
+	})
+
+	it("shows Item as Product while keeping the DocType value", () => {
+		expect(getLinkFieldDisplayLabel("DocType", "Item", "Item")).toBe("Product")
+		expect(getLinkFieldDisplayLabel("DocType", "Item", "物料", "zh-CN")).toBe("商品")
+		expect(getLinkFieldDisplayLabel("DocType", "Item", "Item", "zh-CN")).toBe("商品")
+		expect(getLinkFieldDisplayLabel("DocType", "Customer", "Customer")).toBe("Customer")
 	})
 })

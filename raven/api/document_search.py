@@ -57,6 +57,8 @@ def _parse_filters(filters: str | list | dict | None) -> list[list]:
 def _get_tagged_item_names(txt: str, limit: int) -> list[str]:
 	if not txt or not frappe.db.exists("DocType", "Tag Link"):
 		return []
+	if not frappe.has_permission("Tag Link", "read"):
+		return []
 	tags = frappe.get_list(
 		"Tag Link",
 		filters={"document_type": "Item", "tag": ["like", f"%{txt}%"]},

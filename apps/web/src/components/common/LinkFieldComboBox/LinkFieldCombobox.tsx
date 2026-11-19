@@ -20,7 +20,7 @@ import _ from "@lib/translate";
 import ErrorBanner from "@components/ui/error-banner";
 import { Skeleton } from "@components/ui/skeleton";
 import MarkdownRenderer from "@components/ui/markdown";
-import { getLinkFieldSearchAPIPath } from "./linkSearch";
+import { getLinkFieldDisplayLabel, getLinkFieldSearchAPIPath } from "./linkSearch";
 
 export interface ResultItem {
     value: string,
@@ -45,10 +45,10 @@ const LINK_ITEM_STYLES = cn(FILTER_ITEM_STYLES, "h-auto my-0.5")
  * shallow compare on `item` is what makes the memo actually hit; a new search
  * result is a new object and re-renders as it must.
  */
-const LinkItemContent = memo(({ item }: { item: ResultItem }) => {
+const LinkItemContent = memo(({ item, doctype }: { item: ResultItem, doctype: string }) => {
     // Strings only: the search returns a doctype's title field and name as they are, and
     // a numeric title field or an integer-named document arrives as a number.
-    const label = String(item.label || item.value)
+    const label = _(getLinkFieldDisplayLabel(doctype, item.value, String(item.label || item.value)))
     const description = item.description == null ? "" : String(item.description)
     return (
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
@@ -167,7 +167,7 @@ const LinkFieldCombobox = ({
     hideCreate = false,
     filterFn,
     suggestedItems,
-    placeholder = _("Select {0}", [doctype]),
+    placeholder,
     customQuery,
     searchfield,
     searchAPIPath = getLinkFieldSearchAPIPath(doctype),
@@ -210,6 +210,11 @@ const LinkFieldCombobox = ({
     })
 
     const linkTitle = meta?.title_field && meta?.show_title_field_in_link ? (linkTitleData?.message?.[meta?.title_field] ?? value) : value
+    const displayLinkTitle = linkTitle
+        ? _(getLinkFieldDisplayLabel(doctype, String(value), String(linkTitle)))
+        : linkTitle
+    const displayDoctype = _(getLinkFieldDisplayLabel("DocType", doctype))
+    const resolvedPlaceholder = placeholder ?? _("Select {0}", [displayDoctype])
 
     // Resolved server-side, not hand-built: Frappe apps that don't live under /app (Frappe
     // CRM leads are at /crm/leads/…) need document_link.get's `raven_document_link_override`
@@ -299,7 +304,7 @@ const LinkFieldCombobox = ({
             onSelect={() => onSelect(item.value)}
             className={LINK_ITEM_STYLES}
         >
-            <LinkItemContent item={item} />
+            <LinkItemContent item={item} doctype={doctype} />
         </FilterComboboxItem>
     )
 
@@ -322,7 +327,7 @@ const LinkFieldCombobox = ({
                 // disabled keeps pointer-events so cursor-not-allowed shows; pr-7 = room for the clear ×.
                 className={cn(FILTER_TRIGGER_STYLES, "group w-full disabled:pointer-events-auto", showClear && "pr-7", readOnly && "text-ink-gray-5", buttonClassName)}>
                 <span className={cn("min-w-0 flex-1 truncate text-left", !linkTitle && "text-ink-gray-4")}>
-                    {linkTitle || placeholder}
+                    {displayLinkTitle || resolvedPlaceholder}
                 </span>
 
                 <div className="flex items-center gap-1">
@@ -349,7 +354,7 @@ const LinkFieldCombobox = ({
             {/* linkTitle, like the form branch: a doctype with a title field shows
                 "English", not "en". Falls back to the raw value. */}
             <span className={cn("min-w-0 flex-1 truncate text-left", !linkTitle && "text-ink-gray-4")}>
-                {linkTitle || placeholder}
+                {displayLinkTitle || resolvedPlaceholder}
             </span>
 
             {!showClear && <ChevronDownIcon className="size-4 shrink-0 text-ink-gray-4" />}
@@ -401,7 +406,7 @@ const LinkFieldCombobox = ({
                                     elsewhere (e.g. Frappe CRM). Left as-is until such an endpoint
                                     exists. */}
                                 <a href={`/desk/${slug(doctype)}/new-${slug(doctype)}-1`} target="_blank">
-                                    {_("Create New {0}", [doctype])}
+                                    {_("Create New {0}", [displayDoctype])}
                                     <ExternalLink />
                                 </a>
                             </CommandItem>

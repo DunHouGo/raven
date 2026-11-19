@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import _ from "@lib/translate"
 import type { ResultItem } from "@components/common/LinkFieldComboBox/LinkFieldCombobox"
+import { getLinkFieldDisplayLabel } from "@components/common/LinkFieldComboBox/linkSearch"
 
 const STORAGE_KEY = "recently-used-doctype"
 const MAX_RECENT = 5
@@ -10,7 +11,7 @@ const MAX_RECENT = 5
 /** Common business documents shown before the server's alphabetical results. */
 export const COMMON_DOCUMENT_TYPES: ResultItem[] = [
 	{ value: "Sales Order", label: "Sales Order", description: "Selling" },
-	{ value: "Item", label: "Item", description: "Products" },
+	{ value: "Item", label: "Product", description: "Products" },
 	{ value: "Customer", label: "Customer", description: "Selling" },
 	{ value: "Email Queue", label: "Email Queue", description: "Core" },
 	{ value: "Task", label: "Task", description: "Projects" },
@@ -53,7 +54,9 @@ export const useRecentlyUsedDocType = () => {
 	const suggestedItems = useMemo<ResultItem[]>(
 		() => getSuggestedDocumentTypes(recent).map((item) => ({
 			...item,
-			label: _(item.label || item.value),
+			label: item.value === "Item"
+				? getLinkFieldDisplayLabel("DocType", item.value, item.label || item.value)
+				: _(item.label || item.value),
 			description: item.description ? _(item.description) : "",
 		})),
 		[recent],
