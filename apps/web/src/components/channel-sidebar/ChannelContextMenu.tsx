@@ -52,7 +52,10 @@ export function ChannelContextMenu({ channel, children }: ChannelContextMenuProp
 
     return (
         <ContextMenu>
-            <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+            {/* 避免 Radix Slot 改写 NavLink 的函数式 className。 */}
+            <ContextMenuTrigger asChild>
+                <div className="contents">{children}</div>
+            </ContextMenuTrigger>
             <ContextMenuContent className="w-56">
                 <ContextMenuLabel className="truncate">{channel.channel_name}</ContextMenuLabel>
                 <ContextMenuSeparator />
