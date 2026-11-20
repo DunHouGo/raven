@@ -51,6 +51,7 @@ const AttachFrappeDocumentDialog = ({ channelID, open, onOpenChange, hideTrigger
 
     const setLinkedDocument = useSetAtom(linkedDocumentAtom(channelID))
     const { recentlyUsedDocumentTypes, addRecentlyUsedDocType } = useRecentlyUsedDocType()
+
     const methods = useForm<AttachDocumentForm>({ defaultValues: { doctype: '', docname: '' } })
     const { control, handleSubmit, reset, setValue } = methods
     const doctype = useWatch({ control, name: 'doctype' })
