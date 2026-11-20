@@ -6,10 +6,11 @@ from frappe import _
 COMMON_DOCUMENT_TYPES = (
     "Sales Order",
     "Item",
-    "Customer",
     "Communication",
     "Wiki Document",
+    "Customer",
 )
+PINNED_DOCUMENT_TYPES = ("Communication", "Wiki Document")
 MAX_RECENT_DOCUMENT_TYPES = 3
 MAX_SUGGESTED_DOCUMENT_TYPES = 5
 DOCUMENT_TYPE_SEARCH_ALIASES = {
@@ -73,7 +74,13 @@ def search_document_types(
         )
     else:
         recent = _parse_recent_document_types(recent_doctypes)
-        candidates = dict.fromkeys([*recent, *COMMON_DOCUMENT_TYPES])
+        pinned = [name for name in PINNED_DOCUMENT_TYPES if name in readable_types]
+        remaining = [
+            name
+            for name in COMMON_DOCUMENT_TYPES
+            if name not in PINNED_DOCUMENT_TYPES
+        ]
+        candidates = dict.fromkeys([*recent, *pinned, *remaining])
         limit = min(limit, MAX_SUGGESTED_DOCUMENT_TYPES)
 
     results: list[dict[str, str]] = []

@@ -20,7 +20,7 @@ import _ from "@lib/translate";
 import ErrorBanner from "@components/ui/error-banner";
 import { Skeleton } from "@components/ui/skeleton";
 import MarkdownRenderer from "@components/ui/markdown";
-import { getLinkFieldDisplayLabel, getLinkFieldSearchAPIPath } from "./linkSearch";
+import { getLinkFieldDisplayLabel, getLinkFieldResultDisplay, getLinkFieldSearchAPIPath } from "./linkSearch";
 
 export interface ResultItem {
     value: string,
@@ -48,8 +48,9 @@ const LINK_ITEM_STYLES = cn(FILTER_ITEM_STYLES, "h-auto my-0.5")
 const LinkItemContent = memo(({ item, doctype }: { item: ResultItem, doctype: string }) => {
     // Strings only: the search returns a doctype's title field and name as they are, and
     // a numeric title field or an integer-named document arrives as a number.
-    const label = _(getLinkFieldDisplayLabel(doctype, item.value, String(item.label || item.value)))
-    const description = item.description == null ? "" : String(item.description)
+    const display = getLinkFieldResultDisplay(doctype, item)
+    const label = _(getLinkFieldDisplayLabel(doctype, item.value, display.label))
+    const description = display.description
     return (
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
             <span className="truncate text-base-medium text-ink-gray-7"><MarkdownRenderer content={label} /></span>

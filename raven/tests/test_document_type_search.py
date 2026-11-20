@@ -38,7 +38,7 @@ class TestDocumentTypeSearch(TestCase):
         ]
         self.assertEqual(
             [row["value"] for row in search_document_types()],
-            ["Item", "Customer", "Wiki Document"],
+            ["Wiki Document", "Item", "Customer"],
         )
         self.get_meta.assert_any_call("Wiki Document")
         self.assertNotIn(
@@ -62,7 +62,38 @@ class TestDocumentTypeSearch(TestCase):
         recent = '["Custom A", "Custom A", "Custom B", "Custom C", "Custom D"]'
         self.assertEqual(
             [row["value"] for row in search_document_types(recent_doctypes=recent)],
-            ["Custom A", "Custom B", "Custom C", "Sales Order", "Item"],
+            [
+                "Custom A",
+                "Custom B",
+                "Custom C",
+                "Communication",
+                "Wiki Document",
+            ],
+        )
+
+    def test_knowledge_base_and_email_remain_suggested_after_a_recent_type(self) -> None:
+        self.readable_types.return_value = [
+            "Purchase Order",
+            "Sales Order",
+            "Item",
+            "Customer",
+            "Communication",
+            "Wiki Document",
+        ]
+        self.assertEqual(
+            [
+                row["value"]
+                for row in search_document_types(
+                    recent_doctypes='["Purchase Order"]'
+                )
+            ],
+            [
+                "Purchase Order",
+                "Communication",
+                "Wiki Document",
+                "Sales Order",
+                "Item",
+            ],
         )
 
     def test_search_excludes_settings_and_child_tables(self) -> None:
