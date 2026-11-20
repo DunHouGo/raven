@@ -90,6 +90,7 @@ def get_channel_list(hide_archived: bool = False):
 			channel.channel_name,
 			channel.type,
 			channel.channel_description,
+			channel.channel_image,
 			channel.is_archived,
 			channel.is_direct_message,
 			channel.is_self_message,

@@ -25,7 +25,7 @@ import {
     DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar"
-import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon"
+import { ChannelAvatar } from "@components/common/ChannelAvatar/ChannelAvatar"
 import { CustomizeSidebarButton } from "@components/features/channel/CustomizeSidebar/CustomizeSidebarButton"
 import { CreateChannelDialog } from "@components/features/channel/CreateChannel/CreateChannelButton"
 import { MobileSearchButton } from "@components/features/header/QuickSearch/SearchButton"
@@ -42,6 +42,7 @@ import { useChannelDraft } from "@components/features/ChatInput/draft"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip"
 import type { ChannelListItem } from "@raven/types/common/ChannelListItem"
 import { useIsMobile } from "@hooks/use-mobile"
+import { ChannelContextMenu } from "./ChannelContextMenu"
 
 interface GroupsState {
     [key: string]: boolean
@@ -465,29 +466,31 @@ const ChannelRow = ({ channel, workspaceID }: { channel: ChannelListItem; worksp
     const draft = useChannelDraft(channel.name)
 
     return (
-        <NavLink
-            {...prefetchHandlers}
-            to={`/${encodeURIComponent(workspaceID ?? "")}/${encodeURIComponent(channel.name)}`}
-            className={({ isActive }) => channelRowClassName({ isActive, unread: unread > 0 && !channel.muted })}
-        >
-            <ChannelIcon type={channel.type || "Public"} className="h-4 w-4 shrink-0" />
-            <span className={channelRowLabelClassName(unread > 0 && !channel.muted)}>{channel.channel_name}</span>
-            {draft && (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <PencilLine className="h-3.5 w-3.5 shrink-0 text-ink-gray-5" />
-                    </TooltipTrigger>
-                    {/* The draft text itself — channel rows have no preview line to show it */}
-                    <TooltipContent side="right" className="max-w-64">
-                        <span className="line-clamp-3 break-words">{_("Draft")}: {draft}</span>
-                    </TooltipContent>
-                </Tooltip>
-            )}
-            {unread > 0 && !channel.muted && (
-                <Badge size="sm" variant="ghost" theme="gray" className="shrink-0 px-0 justify-center tabular-nums">
-                    {unread > 9 ? "9+" : unread}
-                </Badge>
-            )}
-        </NavLink>
+        <ChannelContextMenu channel={channel}>
+            <NavLink
+                {...prefetchHandlers}
+                to={`/${encodeURIComponent(workspaceID ?? "")}/${encodeURIComponent(channel.name)}`}
+                className={({ isActive }) => channelRowClassName({ isActive, unread: unread > 0 && !channel.muted })}
+            >
+                <ChannelAvatar type={channel.type || "Public"} image={channel.channel_image} className="size-4 rounded-sm" iconClassName="size-3" />
+                <span className={channelRowLabelClassName(unread > 0 && !channel.muted)}>{channel.channel_name}</span>
+                {draft && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <PencilLine className="h-3.5 w-3.5 shrink-0 text-ink-gray-5" />
+                        </TooltipTrigger>
+                        {/* The draft text itself — channel rows have no preview line to show it */}
+                        <TooltipContent side="right" className="max-w-64">
+                            <span className="line-clamp-3 break-words">{_("Draft")}: {draft}</span>
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+                {unread > 0 && !channel.muted && (
+                    <Badge size="sm" variant="ghost" theme="gray" className="shrink-0 px-0 justify-center tabular-nums">
+                        {unread > 9 ? "9+" : unread}
+                    </Badge>
+                )}
+            </NavLink>
+        </ChannelContextMenu>
     )
 }

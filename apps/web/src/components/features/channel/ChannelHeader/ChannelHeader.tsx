@@ -1,7 +1,7 @@
 import { Button } from "@components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip"
 import { ArrowUpRight, ChevronLeft, Pin, Star } from "lucide-react"
-import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon"
+import { ChannelAvatar } from "@components/common/ChannelAvatar/ChannelAvatar"
 import ChannelMembers from "./ChannelMembers"
 import ChannelMenu from "./ChannelMenu"
 import { useAtomValue } from "jotai"
@@ -99,7 +99,7 @@ const ChannelHeader = ({ channelID, showActions = true, onOpenChannel }: Channel
                     ) : (
                         // Plain title (same look as ChannelMenu's trigger) — no dropdown.
                         <div className="flex items-center gap-1 min-w-0 px-1.5">
-                            <ChannelIcon type={channel?.type ?? "Public"} className="size-4.5 md:size-4 shrink-0" />
+                            <ChannelAvatar type={channel?.type ?? "Public"} image={channel?.channel_image} className="size-4.5 rounded-sm md:size-4" iconClassName="size-3" />
                             <span className="text-lg md:text-sm font-medium truncate">{channel?.channel_name}</span>
                         </div>
                     )}

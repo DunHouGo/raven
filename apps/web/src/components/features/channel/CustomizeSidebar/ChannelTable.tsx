@@ -1,3 +1,4 @@
+import { ChannelAvatar } from "@components/common/ChannelAvatar/ChannelAvatar"
 import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon"
 import { ListView } from "@components/ui/list-view"
 import type { ListViewColumnMeta } from "@components/ui/list-view"
@@ -15,6 +16,7 @@ interface ChannelTable {
   name: string,
   channel_name: string,
   channel_description: string,
+  channel_image?: string,
   type: "Private" | "Public" | "Open",
   channel_group: string
   /** Set when the user's own sidebar preferences hide this channel — the row
@@ -41,6 +43,7 @@ export const ChannelTable = ({ data }: { data: ChannelSidebarData }) => {
           name: channel.name,
           channel_name: channel.channel_name,
           channel_description: channel.channel_description || '',
+          channel_image: channel.channel_image,
           type: channel.type,
           channel_group: groupName,
           hiddenReason: channel._hiddenReason
@@ -54,6 +57,7 @@ export const ChannelTable = ({ data }: { data: ChannelSidebarData }) => {
         name: channel.name,
         channel_name: channel.channel_name,
         channel_description: channel.channel_description || '',
+        channel_image: channel.channel_image,
         type: channel.type,
         channel_group: '',
         hiddenReason: channel._hiddenReason
@@ -80,9 +84,11 @@ export const ChannelTable = ({ data }: { data: ChannelSidebarData }) => {
         const r = row.original
         return (
           <div className='flex items-center gap-2 min-w-0'>
-            <ChannelIcon
+            <ChannelAvatar
               type={r.type || "Public"}
-              className={cn("w-4 h-4 shrink-0", r.hiddenReason && "text-ink-gray-4")}
+              image={r.channel_image}
+              className={cn("size-4 rounded-sm shrink-0", r.hiddenReason && "opacity-60")}
+              iconClassName="size-3"
             />
             <span className={cn('font-medium truncate', r.hiddenReason && 'text-ink-gray-4 font-normal')}>{r.channel_name}</span>
             {r.hiddenReason && (

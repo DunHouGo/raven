@@ -1,4 +1,4 @@
-import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon";
+import { ChannelAvatar } from "@components/common/ChannelAvatar/ChannelAvatar";
 import { Button } from "@components/ui/button";
 import {
     DropdownMenu,
@@ -44,7 +44,7 @@ const ChannelMenu = ({ channelID }: { channelID: string }) => {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size={isMobile ? "md" : "sm"} className="min-w-0 shrink">
                     <div className="flex items-center gap-1 min-w-0">
-                        <ChannelIcon type={channel.type} className="size-4.5 md:size-4 shrink-0" />
+                        <ChannelAvatar type={channel.type} image={channel.channel_image} className="size-4.5 rounded-sm md:size-4" iconClassName="size-3" />
                         <span className="text-lg md:text-base font-medium truncate min-w-0">
                             {channel.channel_name}
                         </span>

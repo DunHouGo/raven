@@ -10,6 +10,7 @@
  "field_order": [
   "channel_name",
   "channel_description",
+  "channel_image",
   "type",
   "column_break_imbh",
   "is_synced",
@@ -82,6 +83,11 @@
    "fieldname": "channel_description",
    "fieldtype": "Small Text",
    "label": "Channel Description"
+  },
+  {
+   "fieldname": "channel_image",
+   "fieldtype": "Attach Image",
+   "label": "Channel Image"
   },
   {
    "fieldname": "column_break_puci",

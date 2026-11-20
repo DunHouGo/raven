@@ -15,6 +15,8 @@ export interface RavenChannel {
 	channel_name: string
 	/**	Channel Description : Small Text	*/
 	channel_description?: string
+	/**	Channel Image : Attach Image	*/
+	channel_image?: string
 	/**	Type : Select	*/
 	type: "Private" | "Public" | "Open"
 	/**	Is Synced : Check	*/

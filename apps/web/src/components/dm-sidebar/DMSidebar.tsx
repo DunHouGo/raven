@@ -25,6 +25,7 @@ import { useUserCookieData } from "@hooks/useUserCookieData"
 import { MobileSearchButton } from "@components/features/header/QuickSearch/SearchButton"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@components/ui/empty"
 import { UsersRoundIcon } from "lucide-react"
+import { ChannelContextMenu } from "@components/channel-sidebar/ChannelContextMenu"
 
 /** A DM channel joined to its resolved peer — what a sidebar row renders. */
 type DMRowData = { dm: DMChannelListItem; peer: UserData }
@@ -245,19 +246,23 @@ const DMRow = memo(function DMRow({ dmChannel, peerUser }: DMRowProps) {
     // it's the thing you'd want to be reminded of when scanning the list.
     const draft = useChannelDraft(dmChannel.name)
 
-    return <NavLink {...prefetchHandlers} to={`/dm-channel/${encodeURIComponent(dmChannel.name)}`} className="block px-2 py-0.5">
-        {({ isActive }) => (
-            <DMRowShell
-                user={peerUser}
-                name={displayName}
-                date={date}
-                lastMessage={draft || lastMessage}
-                isDraft={Boolean(draft)}
-                unread={unread}
-                isActive={isActive}
-            />
-        )}
-    </NavLink>
+    return (
+        <ChannelContextMenu channel={dmChannel}>
+            <NavLink {...prefetchHandlers} to={`/dm-channel/${encodeURIComponent(dmChannel.name)}`} className="block px-2 py-0.5">
+                {({ isActive }) => (
+                    <DMRowShell
+                        user={peerUser}
+                        name={displayName}
+                        date={date}
+                        lastMessage={draft || lastMessage}
+                        isDraft={Boolean(draft)}
+                        unread={unread}
+                        isActive={isActive}
+                    />
+                )}
+            </NavLink>
+        </ChannelContextMenu>
+    )
 })
 
 

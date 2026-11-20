@@ -1,5 +1,5 @@
 import { UserAvatar } from '@components/features/message/UserAvatar'
-import { ChannelIcon } from '@components/common/ChannelIcon/ChannelIcon'
+import { ChannelImageMenu } from './ChannelImageMenu'
 import { useChannel } from '@hooks/useChannel'
 import { useUser } from '@hooks/useUser'
 import { formatDate } from '@lib/date'
@@ -23,9 +23,9 @@ const ChannelInfo = ({ channelID }: { channelID: string }) => {
 
     return (
         <div className="flex flex-col gap-1 px-3.5 md:pt-3 pb-4">
-            <div className="flex items-center gap-1.5 justify-between">
-                <div className="flex items-center gap-1 overflow-hidden">
-                    <ChannelIcon type={channel.type} className="size-4 shrink-0 text-ink-gray-7" />
+            <div className="flex items-center gap-2 justify-between">
+                <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+                    <ChannelImageMenu channel={channel} canEdit={canManageChannel(channel)} />
                     <span className="text-lg-medium text-ink-gray-7 truncate" title={channel.channel_name}>{channel.channel_name}</span>
                 </div>
                 {canManageChannel(channel) && <EditChannelDescriptionButton channel={channel} />}

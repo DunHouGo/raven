@@ -12,6 +12,7 @@ const sameChannel = (a: ChannelListItem, b: ChannelListItem): boolean =>
     a.type === b.type &&
     a.is_archived === b.is_archived &&
     a.channel_description === b.channel_description &&
+    a.channel_image === b.channel_image &&
     a.workspace === b.workspace &&
     a.last_message_timestamp === b.last_message_timestamp &&
     a.last_message_details === b.last_message_details &&
