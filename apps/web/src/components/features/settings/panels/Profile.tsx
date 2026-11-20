@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
 import type { RavenUser } from "@raven/types/Raven/RavenUser"
 import { getStatusIndicatorColor } from "@components/features/message/UserAvatar"
-import { ProfileImageMenu } from "@components/features/profile/ProfileImageMenu"
 import { Button } from "@components/ui/button"
 import { Form } from "@components/ui/form"
 import { DataField, SelectFormField } from "@components/ui/form-elements"
@@ -32,10 +31,8 @@ const statusOptions = () => [
 ] as const
 
 type ProfileFormValues = {
-    full_name: string
     availability_status: string
     custom_status: string
-    contact_number: string
 }
 
 /**
@@ -60,19 +57,15 @@ const ProfileForm = ({ myProfile }: { myProfile: RavenUser }) => {
 
     const form = useForm<ProfileFormValues>({
         defaultValues: {
-            full_name: myProfile.full_name ?? "",
             availability_status: myProfile.availability_status ?? "",
             custom_status: myProfile.custom_status ?? "",
-            contact_number: myProfile.contact_number ?? "",
         },
     })
 
     const onSubmit = async (values: ProfileFormValues) => {
         updateDoc("Raven User", myProfile.name, {
-            full_name: values.full_name,
             availability_status: values.availability_status,
             custom_status: values.custom_status,
-            contact_number: values.contact_number,
         })
             .then(() => {
                 toast.success(_("Profile updated"), { id: SAVE_TOAST_ID })
@@ -117,25 +110,8 @@ const ProfileForm = ({ myProfile }: { myProfile: RavenUser }) => {
 
             <SettingsPanelContent>
                 <div className="flex w-full flex-col gap-6 py-2">
-                    {/* Tapping the avatar opens the upload / remove photo menu — the
-                        same component the mobile profile page uses. Photo changes
-                        apply immediately (not part of the form's save). */}
-                    <div className="flex items-center justify-center rounded-lg bg-surface-gray-1 dark:bg-surface-gray-2 py-6">
-                        <ProfileImageMenu />
-                    </div>
-
                     <Form {...form}>
                         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-                            <DataField
-                                name="full_name"
-                                label={_("Full name")}
-                                isRequired
-                                rules={{
-                                    required: _("Name is required"),
-                                    maxLength: { value: 140, message: _("Name cannot be more than 140 characters.") },
-                                }}
-                            />
-
                             <SelectFormField name="availability_status" label={_("Availability")}>
                                 {statusOptions().map((option) => (
                                     <SelectItem key={option.value} value={option.value}>
@@ -157,12 +133,6 @@ const ProfileForm = ({ myProfile }: { myProfile: RavenUser }) => {
                                 }}
                             />
 
-                            <DataField
-                                name="contact_number"
-                                label={_("Phone")}
-                                formDescription={_("Shown on your profile")}
-                                inputProps={{ placeholder: "+91 9999 999 999", type: "tel" }}
-                            />
                         </form>
                     </Form>
                 </div>
